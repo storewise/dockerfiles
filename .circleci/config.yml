@@ -1,0 +1,58 @@
+version: 2.1
+orbs:
+  docker: circleci/docker@1.5.0
+workflows:
+  publish:
+    jobs:
+      - docker/hadolint:
+          ignore-rules: DL3002,DL3018
+          dockerfiles: "\
+            curator/Dockerfile:\
+            elastalert/Dockerfile:\
+            jq/Dockerfile:\
+            sia-log-monitor/Dockerfile"
+      - docker/publish:
+          context: github-package-registry
+          path: curator
+          image: storewise/images/curator
+          tag: latest
+          registry: ghcr.io
+          requires:
+            - docker/hadolint
+          filters:
+            branches:
+              only: master
+      - docker/publish:
+          context: github-package-registry
+          path: elastalert
+          image: storewise/images/elastalert
+          tag: latest
+          registry: ghcr.io
+          requires:
+            - docker/hadolint
+          filters:
+            branches:
+              only: master
+      - docker/publish:
+          context: github-package-registry
+          path: jq
+          image: storewise/images/jq
+          tag: latest
+          registry: ghcr.io
+          requires:
+            - docker/hadolint
+          filters:
+            branches:
+              only: master
+      - docker/publish:
+          context: github-package-registry
+          path: sia-log-monitor
+          docker-context: sia-log-monitor
+          image: storewise/images/sia-log-monitor
+          tag: latest
+          registry: ghcr.io
+          requires:
+            - docker/hadolint
+          filters:
+            branches:
+              only: master
